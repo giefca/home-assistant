@@ -13,12 +13,8 @@
                 "data": {
                     "password": "Geslo"
                 },
-                "description": "Vnesite geslo, ki ste ga nastavili v konfiguraciji za {name}.",
+                "description": "Vnesite geslo, ki ste ga nastavili v svoji konfiguraciji.",
                 "title": "Vnesite geslo"
-            },
-            "discovery_confirm": {
-                "description": "\u017delite dodati ESPHome vozli\u0161\u010de ` {name} ` v Home Assistant?",
-                "title": "Odkrita ESPHome vozli\u0161\u010da"
             },
             "user": {
                 "data": {

@@ -279,7 +279,6 @@ class Thermostat(ClimateDevice):
             "fan": self.fan,
             "climate_mode": self.mode,
             "operation": operation,
-            "equipment_running": status,
             "climate_list": self.climate_list,
             "fan_min_on_time": self.fan_min_on_time
         }

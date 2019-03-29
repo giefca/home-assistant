@@ -42,6 +42,7 @@ reports=no
 [TYPECHECK]
 # For attrs
 ignored-classes=_CountingAttr
+generated-members=botocore.errorfactory
 
 [FORMAT]
 expected-line-ending-format=LF

@@ -1,7 +1,6 @@
 """Provide a way to connect devices to one physical location."""
 import logging
 import uuid
-from asyncio import Event
 from collections import OrderedDict
 from typing import MutableMapping  # noqa: F401
 from typing import Iterable, Optional, cast
@@ -10,7 +9,6 @@ import attr
 
 from homeassistant.core import callback
 from homeassistant.loader import bind_hass
-
 from .typing import HomeAssistantType
 
 _LOGGER = logging.getLogger(__name__)
@@ -135,21 +133,14 @@ class AreaRegistry:
 @bind_hass
 async def async_get_registry(hass: HomeAssistantType) -> AreaRegistry:
     """Return area registry instance."""
-    reg_or_evt = hass.data.get(DATA_REGISTRY)
+    task = hass.data.get(DATA_REGISTRY)
 
-    if not reg_or_evt:
-        evt = hass.data[DATA_REGISTRY] = Event()
+    if task is None:
+        async def _load_reg() -> AreaRegistry:
+            registry = AreaRegistry(hass)
+            await registry.async_load()
+            return registry
 
-        reg = AreaRegistry(hass)
-        await reg.async_load()
+        task = hass.data[DATA_REGISTRY] = hass.async_create_task(_load_reg())
 
-        hass.data[DATA_REGISTRY] = reg
-        evt.set()
-        return reg
-
-    if isinstance(reg_or_evt, Event):
-        evt = reg_or_evt
-        await evt.wait()
-        return cast(AreaRegistry, hass.data.get(DATA_REGISTRY))
-
-    return cast(AreaRegistry, reg_or_evt)
+    return cast(AreaRegistry, await task)

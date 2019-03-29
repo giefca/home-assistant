@@ -130,7 +130,6 @@ async def test_module_webcomponent(hass):
             },
             'embed_iframe': True,
             'trust_external_script': True,
-            'require_admin': True,
         }
     }
 
@@ -146,7 +145,6 @@ async def test_module_webcomponent(hass):
 
     panel = panels['nice_url']
 
-    assert panel.require_admin
     assert panel.config == {
         'hello': 'world',
         '_panel_custom': {

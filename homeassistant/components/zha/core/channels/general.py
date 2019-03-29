@@ -7,7 +7,7 @@ https://home-assistant.io/components/zha/
 import logging
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-from . import ZigbeeChannel, parse_and_log_command, MAINS_POWERED
+from . import ZigbeeChannel, parse_and_log_command
 from ..helpers import get_attr_id_by_name
 from ..const import (
     SIGNAL_ATTR_UPDATED, SIGNAL_MOVE_LEVEL, SIGNAL_SET_LEVEL,
@@ -64,14 +64,9 @@ class OnOffChannel(ZigbeeChannel):
 
     async def async_update(self):
         """Initialize channel."""
-        from_cache = not self.device.power_source == MAINS_POWERED
-        _LOGGER.debug(
-            "%s is attempting to update onoff state - from cache: %s",
-            self._unique_id,
-            from_cache
-        )
+        _LOGGER.debug("Attempting to update onoff state")
         self._state = bool(
-            await self.get_attribute_value(self.ON_OFF, from_cache=from_cache))
+            await self.get_attribute_value(self.ON_OFF, from_cache=False))
         await super().async_update()
 
 

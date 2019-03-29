@@ -1,16 +1,14 @@
 """Provide a way to connect entities belonging to one device."""
 import logging
 import uuid
-from asyncio import Event
+from typing import List, Optional
+
 from collections import OrderedDict
-from typing import List, Optional, cast
 
 import attr
 
 from homeassistant.core import callback
 from homeassistant.loader import bind_hass
-
-from .typing import HomeAssistantType
 
 _LOGGER = logging.getLogger(__name__)
 _UNDEF = object()
@@ -275,26 +273,19 @@ class DeviceRegistry:
 
 
 @bind_hass
-async def async_get_registry(hass: HomeAssistantType) -> DeviceRegistry:
+async def async_get_registry(hass) -> DeviceRegistry:
     """Return device registry instance."""
-    reg_or_evt = hass.data.get(DATA_REGISTRY)
+    task = hass.data.get(DATA_REGISTRY)
 
-    if not reg_or_evt:
-        evt = hass.data[DATA_REGISTRY] = Event()
+    if task is None:
+        async def _load_reg():
+            registry = DeviceRegistry(hass)
+            await registry.async_load()
+            return registry
 
-        reg = DeviceRegistry(hass)
-        await reg.async_load()
+        task = hass.data[DATA_REGISTRY] = hass.async_create_task(_load_reg())
 
-        hass.data[DATA_REGISTRY] = reg
-        evt.set()
-        return reg
-
-    if isinstance(reg_or_evt, Event):
-        evt = reg_or_evt
-        await evt.wait()
-        return cast(DeviceRegistry, hass.data.get(DATA_REGISTRY))
-
-    return cast(DeviceRegistry, reg_or_evt)
+    return await task
 
 
 @callback

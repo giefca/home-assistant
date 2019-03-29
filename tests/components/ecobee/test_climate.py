@@ -183,8 +183,7 @@ class TestEcobee(unittest.TestCase):
                 'fan': 'off',
                 'fan_min_on_time': 10,
                 'climate_mode': 'Climate1',
-                'operation': 'heat',
-                'equipment_running': 'heatPump2'} == \
+                'operation': 'heat'} == \
             self.thermostat.device_state_attributes
 
         self.ecobee['equipmentStatus'] = 'auxHeat2'
@@ -193,8 +192,7 @@ class TestEcobee(unittest.TestCase):
                 'fan': 'off',
                 'fan_min_on_time': 10,
                 'climate_mode': 'Climate1',
-                'operation': 'heat',
-                'equipment_running': 'auxHeat2'} == \
+                'operation': 'heat'} == \
             self.thermostat.device_state_attributes
         self.ecobee['equipmentStatus'] = 'compCool1'
         assert {'actual_humidity': 15,
@@ -202,8 +200,7 @@ class TestEcobee(unittest.TestCase):
                 'fan': 'off',
                 'fan_min_on_time': 10,
                 'climate_mode': 'Climate1',
-                'operation': 'cool',
-                'equipment_running': 'compCool1'} == \
+                'operation': 'cool'} == \
             self.thermostat.device_state_attributes
         self.ecobee['equipmentStatus'] = ''
         assert {'actual_humidity': 15,
@@ -211,8 +208,7 @@ class TestEcobee(unittest.TestCase):
                 'fan': 'off',
                 'fan_min_on_time': 10,
                 'climate_mode': 'Climate1',
-                'operation': 'idle',
-                'equipment_running': ''} == \
+                'operation': 'idle'} == \
             self.thermostat.device_state_attributes
 
         self.ecobee['equipmentStatus'] = 'Unknown'
@@ -221,8 +217,7 @@ class TestEcobee(unittest.TestCase):
                 'fan': 'off',
                 'fan_min_on_time': 10,
                 'climate_mode': 'Climate1',
-                'operation': 'Unknown',
-                'equipment_running': 'Unknown'} == \
+                'operation': 'Unknown'} == \
             self.thermostat.device_state_attributes
 
     def test_is_away_mode_on(self):

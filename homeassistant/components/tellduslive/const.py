@@ -13,6 +13,7 @@ KEY_CONFIG = 'tellduslive_config'
 
 SIGNAL_UPDATE_ENTITY = 'tellduslive_update'
 
+KEY_HOST = 'host'
 KEY_SESSION = 'session'
 KEY_SCAN_INTERVAL = 'scan_interval'
 

@@ -1,1 +1,1 @@
-"""Component for integrating entur public transport."""
+"""The entur_public_transport component."""

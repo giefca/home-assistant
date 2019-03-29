@@ -15,7 +15,7 @@
         "step": {
             "init": {
                 "data": {
-                    "host": "Hoszt"
+                    "host": "H\u00e1zigazda (Host)"
                 },
                 "title": "V\u00e1lassz Hue bridge-t"
             },

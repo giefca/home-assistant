@@ -1,1 +1,1 @@
-"""The Hyperion component."""
+"""The hyperion component."""

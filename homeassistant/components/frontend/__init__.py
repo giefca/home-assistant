@@ -21,7 +21,7 @@ from homeassistant.loader import bind_hass
 
 from .storage import async_setup_frontend_storage
 
-REQUIREMENTS = ['home-assistant-frontend==20190327.0']
+REQUIREMENTS = ['home-assistant-frontend==20190321.0']
 
 DOMAIN = 'frontend'
 DEPENDENCIES = ['api', 'websocket_api', 'http', 'system_log',
@@ -123,18 +123,14 @@ class Panel:
     # Config to pass to the webcomponent
     config = None
 
-    # If the panel should only be visible to admins
-    require_admin = False
-
     def __init__(self, component_name, sidebar_title, sidebar_icon,
-                 frontend_url_path, config, require_admin):
+                 frontend_url_path, config):
         """Initialize a built-in panel."""
         self.component_name = component_name
         self.sidebar_title = sidebar_title
         self.sidebar_icon = sidebar_icon
         self.frontend_url_path = frontend_url_path or component_name
         self.config = config
-        self.require_admin = require_admin
 
     @callback
     def async_register_index_routes(self, router, index_view):
@@ -154,18 +150,16 @@ class Panel:
             'title': self.sidebar_title,
             'config': self.config,
             'url_path': self.frontend_url_path,
-            'require_admin': self.require_admin,
         }
 
 
 @bind_hass
 async def async_register_built_in_panel(hass, component_name,
                                         sidebar_title=None, sidebar_icon=None,
-                                        frontend_url_path=None, config=None,
-                                        require_admin=False):
+                                        frontend_url_path=None, config=None):
     """Register a built-in panel."""
     panel = Panel(component_name, sidebar_title, sidebar_icon,
-                  frontend_url_path, config, require_admin)
+                  frontend_url_path, config)
 
     panels = hass.data.get(DATA_PANELS)
     if panels is None:
@@ -253,11 +247,9 @@ async def async_setup(hass, config):
 
     await asyncio.wait(
         [async_register_built_in_panel(hass, panel) for panel in (
-            'kiosk', 'states', 'profile')], loop=hass.loop)
-    await asyncio.wait(
-        [async_register_built_in_panel(hass, panel, require_admin=True)
-         for panel in ('dev-event', 'dev-info', 'dev-service', 'dev-state',
-                       'dev-template', 'dev-mqtt')], loop=hass.loop)
+            'dev-event', 'dev-info', 'dev-service', 'dev-state',
+            'dev-template', 'dev-mqtt', 'kiosk', 'states', 'profile')],
+        loop=hass.loop)
 
     hass.data[DATA_FINALIZE_PANEL] = async_finalize_panel
 
@@ -486,11 +478,9 @@ def websocket_get_panels(hass, connection, msg):
 
     Async friendly.
     """
-    user_is_admin = connection.user.is_admin
     panels = {
-        panel_key: panel.to_response()
-        for panel_key, panel in connection.hass.data[DATA_PANELS].items()
-        if user_is_admin or not panel.require_admin}
+        panel: connection.hass.data[DATA_PANELS][panel].to_response()
+        for panel in connection.hass.data[DATA_PANELS]}
 
     connection.send_message(websocket_api.result_message(
         msg['id'], panels))

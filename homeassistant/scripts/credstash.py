@@ -4,7 +4,7 @@ import getpass
 
 from homeassistant.util.yaml import _SECRET_NAMESPACE
 
-REQUIREMENTS = ['credstash==1.15.0']
+REQUIREMENTS = ['credstash==1.15.0', 'botocore==1.7.34']
 
 
 def run(args):
@@ -26,13 +26,14 @@ def run(args):
 
     # pylint: disable=import-error, no-member
     import credstash
+    import botocore
 
     args = parser.parse_args(args)
     table = _SECRET_NAMESPACE
 
     try:
         credstash.listSecrets(table=table)
-    except Exception:  # pylint: disable=broad-except
+    except botocore.errorfactory.ClientError:
         credstash.createDdbTable(table=table)
 
     if args.action == 'list':

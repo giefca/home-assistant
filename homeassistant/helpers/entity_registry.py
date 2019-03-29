@@ -7,11 +7,10 @@ The Entity Registry will persist itself 10 seconds after a new entity is
 registered. Registering a new entity while a timer is in progress resets the
 timer.
 """
-from asyncio import Event
 from collections import OrderedDict
 from itertools import chain
 import logging
-from typing import List, Optional, cast
+from typing import Optional, List
 import weakref
 
 import attr
@@ -20,8 +19,6 @@ from homeassistant.core import callback, split_entity_id, valid_entity_id
 from homeassistant.loader import bind_hass
 from homeassistant.util import ensure_unique_string, slugify
 from homeassistant.util.yaml import load_yaml
-
-from .typing import HomeAssistantType
 
 PATH_REGISTRY = 'entity_registry.yaml'
 DATA_REGISTRY = 'entity_registry'
@@ -280,26 +277,19 @@ class EntityRegistry:
 
 
 @bind_hass
-async def async_get_registry(hass: HomeAssistantType) -> EntityRegistry:
+async def async_get_registry(hass) -> EntityRegistry:
     """Return entity registry instance."""
-    reg_or_evt = hass.data.get(DATA_REGISTRY)
+    task = hass.data.get(DATA_REGISTRY)
 
-    if not reg_or_evt:
-        evt = hass.data[DATA_REGISTRY] = Event()
+    if task is None:
+        async def _load_reg():
+            registry = EntityRegistry(hass)
+            await registry.async_load()
+            return registry
 
-        reg = EntityRegistry(hass)
-        await reg.async_load()
+        task = hass.data[DATA_REGISTRY] = hass.async_create_task(_load_reg())
 
-        hass.data[DATA_REGISTRY] = reg
-        evt.set()
-        return reg
-
-    if isinstance(reg_or_evt, Event):
-        evt = reg_or_evt
-        await evt.wait()
-        return cast(EntityRegistry, hass.data.get(DATA_REGISTRY))
-
-    return cast(EntityRegistry, reg_or_evt)
+    return await task
 
 
 @callback

@@ -61,16 +61,9 @@ SERVICE_SCHEMA_REMOVE_DEVICE = vol.Schema({
 })
 
 
-GATEWAY_CONFIG_MAC_OPT = vol.Schema({
+GATEWAY_CONFIG = vol.Schema({
+    vol.Optional(CONF_MAC, default=None): vol.Any(GW_MAC, None),
     vol.Optional(CONF_KEY):
-        vol.All(cv.string, vol.Length(min=16, max=16)),
-    vol.Optional(CONF_HOST): cv.string,
-    vol.Optional(CONF_PORT, default=9898): cv.port,
-    vol.Optional(CONF_DISABLE, default=False): cv.boolean,
-})
-
-GATEWAY_CONFIG_MAC_REQ = vol.Schema({
-    vol.Required(CONF_KEY):
         vol.All(cv.string, vol.Length(min=16, max=16)),
     vol.Optional(CONF_HOST): cv.string,
     vol.Optional(CONF_PORT, default=9898): cv.port,
@@ -96,10 +89,7 @@ def _fix_conf_defaults(config):
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
         vol.Optional(CONF_GATEWAYS, default={}):
-            vol.All(cv.ensure_list, vol.Any(
-                vol.All([GATEWAY_CONFIG_MAC_OPT], vol.Length(max=1)),
-                vol.All([GATEWAY_CONFIG_MAC_REQ], vol.Length(min=2))
-            ), [_fix_conf_defaults]),
+            vol.All(cv.ensure_list, [GATEWAY_CONFIG], [_fix_conf_defaults]),
         vol.Optional(CONF_INTERFACE, default='any'): cv.string,
         vol.Optional(CONF_DISCOVERY_RETRY, default=3): cv.positive_int
     })
